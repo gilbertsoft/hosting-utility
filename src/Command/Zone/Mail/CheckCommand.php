@@ -36,17 +36,14 @@ class CheckCommand extends BaseCommand
             'type' => DNS_MX,
             'hosts' => [
                 0 => [
-                    'type' => 'MX',
                     'pri' => '10',
                     'target' => 'mail.gilbertsoft.email',
                 ],
                 1 => [
-                    'type' => 'MX',
                     'pri' => '20',
                     'target' => 'mxbackup1.junkemailfilter.com',
                 ],
                 2 => [
-                    'type' => 'MX',
                     'pri' => '30',
                     'target' => 'mxbackup2.junkemailfilter.com',
                 ],
@@ -56,11 +53,9 @@ class CheckCommand extends BaseCommand
             'type' => DNS_CNAME,
             'hosts' => [
                 'autoconfig' => [
-                    'type' => 'CNAME',
                     'target' => 'mail.gilbertsoft.email',
                 ],
                 'autodiscover' => [
-                    'type' => 'CNAME',
                     'target' => 'mail.gilbertsoft.email',
                 ],
             ],
@@ -69,49 +64,42 @@ class CheckCommand extends BaseCommand
             'type' => DNS_SRV,
             'hosts' => [
                 '_imap._tcp' => [
-                    'type' => 'SRV',
                     'pri' => 0,
                     'weight' => 1,
                     'port' => 143,
                     'target' => 'mail.gilbertsoft.email',
                 ],
                 '_imaps._tcp' => [
-                    'type' => 'SRV',
                     'pri' => 0,
                     'weight' => 1,
                     'port' => 993,
                     'target' => 'mail.gilbertsoft.email',
                 ],
                 '_submission._tcp' => [
-                    'type' => 'SRV',
                     'pri' => 0,
                     'weight' => 1,
                     'port' => 587,
                     'target' => 'mail.gilbertsoft.email',
                 ],
                 '_smtps._tcp' => [
-                    'type' => 'SRV',
                     'pri' => 0,
                     'weight' => 1,
                     'port' => 465,
                     'target' => 'mail.gilbertsoft.email',
                 ],
                 '_autodiscover._tcp' => [
-                    'type' => 'SRV',
                     'pri' => 0,
                     'weight' => 1,
                     'port' => 443,
                     'target' => 'mail.gilbertsoft.email',
                 ],
                 '_carddavs._tcp' => [
-                    'type' => 'SRV',
                     'pri' => 0,
                     'weight' => 1,
                     'port' => 443,
                     'target' => 'mail.gilbertsoft.email',
                 ],
                 '_caldavs._tcp' => [
-                    'type' => 'SRV',
                     'pri' => 0,
                     'weight' => 1,
                     'port' => 443,
@@ -126,26 +114,21 @@ class CheckCommand extends BaseCommand
                     DnsUtility::OPTIONS => [
                         DnsUtility::OPT_EXPLICIT_PREFIX => 'v=spf',
                     ],
-                    'type' => 'TXT',
                     'txt' => 'v=spf1 redirect=gilbertsoft.net',
                 ],
                 '_carddavs._tcp' => [
-                    'type' => 'TXT',
                     'txt' => 'path=/SOGo/dav/',
                 ],
                 '_caldavs._tcp' => [
-                    'type' => 'TXT',
                     'txt' => 'path=/SOGo/dav/',
                 ],
                 '_dmarc' => [
-                    'type' => 'TXT',
                     'txt' => 'v=DMARC1; p=reject',
                 ],
                 'dkim._domainkey' => [
                     DnsUtility::OPTIONS => [
                         DnsUtility::OPT_SHORTEN_TO_LENGTH => true,
                     ],
-                    'type' => 'TXT',
                     'txt' => 'v=DKIM1;k=rsa;t=s;s=email;p=',
                 ],
             ],

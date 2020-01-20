@@ -20,16 +20,16 @@ class ZoneValidator
     public const OPT_SHORTEN_TO_LENGTH = 'shorten_to_length';
 
     /**
-     * @param string $zone
+     * @param integer $type
      * @param string $hostname
      * @return array
      */
-    public function getRecords(int $type, string $hostname): array
+    protected function getRecords(int $type, string $hostname): array
     {
         return dns_get_record($hostname, $type);
     }
 
-    private function filterRecords(array $ignoreKeys, array $records): array
+    protected function filterRecords(array $ignoreKeys, array $records): array
     {
         foreach ($records as $recordNo => $record) {
             foreach ($record as $key => $record) {
@@ -55,12 +55,12 @@ class ZoneValidator
         return 0;
     }
 
-    private static function sortRecords(array &$records): bool
+    protected function sortRecords(array &$records): bool
     {
-        return usort($records, array(self::class, "sortRecordsCmp"));
+        return usort($records, array(__CLASS__, "sortRecordsCmp"));
     }
 
-    private static function arrayDiffRecursive($array1, $array2)
+    protected function arrayDiffRecursive($array1, $array2)
     {
         $return = [];
 
@@ -90,7 +90,7 @@ class ZoneValidator
      * @param string $host
      * @return array
      */
-    public static function checkRecords(
+    public function checkRecords(
         array $recordsExpected,
         array $ignoreKeys,
         int $type,
@@ -99,10 +99,10 @@ class ZoneValidator
     ): array {
         $hostname = !empty($host) ? $host . '.' . $zone : $zone;
 
-        $records = static::getRecords($type, $hostname);
+        $records = $this->getRecords($type, $hostname);
 
-        static::sortRecords($records);
-        $filtered = static::filterRecords($ignoreKeys, $records);
+        $this->sortRecords($records);
+        $filtered = $this->filterRecords($ignoreKeys, $records);
 
         if (!is_int(array_key_first($recordsExpected))) {
             $expected[] = $recordsExpected;
@@ -112,20 +112,44 @@ class ZoneValidator
 
 
         foreach ($expected as $eKey => $eValue) {
+            // Handle default keys
             $expected[$eKey]['host'] = $hostname;
+
+            switch ($type) {
+                // DNS_A, DNS_CNAME, DNS_HINFO, DNS_CAA, DNS_MX, DNS_NS, DNS_PTR, DNS_SOA, DNS_TXT, DNS_AAAA, DNS_SRV,
+                // DNS_NAPTR, DNS_A6
+                case DNS_CNAME:
+                    $strType = 'CNAME';
+                    break;
+                case DNS_MX:
+                    $strType = 'MX';
+                    break;
+                case DNS_TXT:
+                    $strType = 'TXT';
+                    break;
+                case DNS_SRV:
+                    $strType = 'SRV';
+                    break;
+                default:
+                    throw new Exception('Error type ' . $type . ' not implemented!');
+            }
+
+            $expected[$eKey]['host'] = $strType;
+
             \ksort($expected[$eKey]);
 
-            foreach ($filtered as $key => $value) {
-                if ($type == DNS_TXT) {
-                    if (array_key_exists(static::OPTIONS, $eValue)) {
-                        foreach ($eValue[static::OPTIONS] as $option => $oValue) {
+            // Apply special options
+            if ($type == DNS_TXT) {
+                foreach ($filtered as $key => $value) {
+                    if (array_key_exists($this->OPTIONS, $eValue)) {
+                        foreach ($eValue[$this->OPTIONS] as $option => $oValue) {
                             switch ($option) {
-                                case static::OPT_EXPLICIT_PREFIX:
+                                case $this->OPT_EXPLICIT_PREFIX:
                                     if (substr($value['txt'], 0, strlen($oValue)) !== $oValue) {
                                         unset($filtered[$key]);
                                     }
                                     break;
-                                case static::OPT_SHORTEN_TO_LENGTH:
+                                case $this->OPT_SHORTEN_TO_LENGTH:
                                     $filtered[$key]['txt'] = substr($value['txt'], 0, strlen($eValue['txt']));
                                     break;
                                 default:
@@ -133,19 +157,19 @@ class ZoneValidator
                             }
                         }
 
-                        unset($expected[$eKey][static::OPTIONS]);
+                        unset($expected[$eKey][$this->OPTIONS]);
                     }
-                }
 
-                if (array_key_exists($key, $filtered) && \is_array($filtered[$key])) {
-                    \ksort($filtered[$key]);
+                    if (array_key_exists($key, $filtered) && \is_array($filtered[$key])) {
+                        \ksort($filtered[$key]);
+                    }
                 }
             }
         }
 
         $filtered = array_values($filtered);
 
-        static::sortRecords($expected);
+        $this->sortRecords($expected);
 
         //var_dump($expected);
         //var_dump($filtered);
