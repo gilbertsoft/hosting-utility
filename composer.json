@@ -1,0 +1,41 @@
+{
+    "name": "gilbertsoft/hosting-utility",
+    "type": "library",
+    "description": "",
+    "keywords": [
+        ""
+    ],
+    "homepage": "https://github.com/gilbertsoft/hosting-utility",
+    "authors": [
+        {
+            "name": "Simon Gilli",
+            "email": "simon@gilbertsoft.org",
+            "role": "Developer",
+            "homepage": "https://gilbertsoft.org/"
+        }
+    ],
+    "license": "GPL-3.0-or-later",
+    "support": {
+        "issues": "https://github.com/gilbertsoft/hosting-utility/issues"
+    },
+    "require": {
+        "symfony/console": "^5.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gilbertsoft\\HostingUtility\\": "src/"
+        }
+    },
+    "bin": [
+        "hosting-utility"
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        },
+        "class": "Gilbertsoft\\HostingUtility\\Composer\\Plugin"
+    }
+}
